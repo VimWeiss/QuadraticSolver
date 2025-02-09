@@ -6,6 +6,7 @@ requires-python = ">=3.11"
 dependencies = [
     "matplotlib>=3.10.0",
     "numpy>=2.2.2",
+    "openai>=1.61.1",
     "sqlalchemy>=2.0.38",
     "streamlit>=1.42.0",
 ]

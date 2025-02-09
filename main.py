@@ -34,9 +34,12 @@ def format_term(coef, var='', power=''):
         return f'+{var}{power}'
     if coef == -1 and var:  # Для случаев -x и -x²
         return f'-{var}{power}'
+
+    # Округляем до 2 знаков и убираем лишние нули после запятой
+    coef_str = f"{coef:.2f}".rstrip('0').rstrip('.')
     if coef > 0:
-        return f'+{coef}{var}{power}'
-    return f'{coef}{var}{power}'
+        return f'+{coef_str}{var}{power}'
+    return f'{coef_str}{var}{power}'
 
 def format_equation(a, b, c):
     terms = []
