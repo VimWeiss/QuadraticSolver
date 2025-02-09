@@ -22,10 +22,38 @@ class EquationHistory(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
-engine = create_engine('sqlite:///equation_history.db') # You might need to adjust the database path
+engine = create_engine('sqlite:///equation_history.db')
 Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
 
+
+def format_term(coef, var='', power=''):
+    if coef == 0:
+        return ''
+    if coef == 1 and var:  # Для случаев x и x²
+        return f'+{var}{power}'
+    if coef == -1 and var:  # Для случаев -x и -x²
+        return f'-{var}{power}'
+    if coef > 0:
+        return f'+{coef}{var}{power}'
+    return f'{coef}{var}{power}'
+
+def format_equation(a, b, c):
+    terms = []
+    # Добавляем ax²
+    if a != 0:
+        terms.append(format_term(a, 'x', '²').lstrip('+'))  # Убираем + в начале
+    # Добавляем bx
+    if b != 0:
+        terms.append(format_term(b, 'x'))
+    # Добавляем c
+    if c != 0:
+        terms.append(format_term(c))
+
+    if not terms:
+        return '0 = 0'
+
+    return ' '.join(terms) + ' = 0'
 
 def plot_quadratic(a, b, c):
     x = np.linspace(-10, 10, 200)
@@ -47,7 +75,7 @@ def save_solution(a, b, c, solver, roots):
         b=b,
         c=c,
         discriminant=solver.get_discriminant(),
-        solution_text=str(roots) if isinstance(roots, str) else f"x₁={roots[0]:.4f}, x₂={roots[1]:.4f}" if len(roots) > 1 else f"x={roots[0]:.4f}",
+        solution_text=str(roots) if isinstance(roots, str) else f"x₁={roots[0]:.2f}, x₂={roots[1]:.2f}" if len(roots) > 1 else f"x={roots[0]:.2f}",
         root1=None if isinstance(roots, str) else roots[0],
         root2=None if isinstance(roots, str) or len(roots) == 1 else roots[1]
     )
@@ -63,11 +91,12 @@ def display_history():
     if history:
         st.markdown("### Последние решения:")
         for entry in history:
+            equation = format_equation(entry.a, entry.b, entry.c)
             st.markdown(f"""
-            **Уравнение:** {entry.a}x² + {entry.b}x + {entry.c} = 0
-            - Дискриминант: {entry.discriminant:.4f}
+            **Уравнение:** {equation}
+            - Дискриминант: {entry.discriminant:.2f}
             - Решение: {entry.solution_text}
-            - Время: {entry.created_at.strftime('%Y-%m-%d %H:%M:%S')}
+            - Время: {entry.created_at.strftime('%H:%M:%S')}
             ---
             """)
 
@@ -96,20 +125,20 @@ def main():
         solver = QuadraticSolver(a, b, c)
 
         st.markdown("### Решение:")
-        st.write(f"Уравнение: {solver.get_equation_str()}")
+        st.write(f"Уравнение: {format_equation(a, b, c)}")
 
         if solver.is_valid():
-            st.write(f"Дискриминант: {solver.get_discriminant():.4f}")
+            st.write(f"Дискриминант: {solver.get_discriminant():.2f}")
 
             roots = solver.solve()
             if isinstance(roots, str):
                 st.warning(roots)
             else:
                 if len(roots) == 1:
-                    st.success(f"x = {roots[0]:.4f}")
+                    st.success(f"x = {roots[0]:.2f}")
                 else:
-                    st.success(f"x₁ = {roots[0]:.4f}")
-                    st.success(f"x₂ = {roots[1]:.4f}")
+                    st.success(f"x₁ = {roots[0]:.2f}")
+                    st.success(f"x₂ = {roots[1]:.2f}")
 
             # Save solution to database
             save_solution(a, b, c, solver, roots)
