@@ -131,22 +131,20 @@ def main():
         st.write(f"Уравнение: {format_equation(a, b, c)}")
 
         if solver.is_valid():
-            st.write(f"Дискриминант: {solver.get_discriminant():.2f}")
+            # Показываем пошаговое решение
+            st.markdown("### Пошаговое решение:")
+            steps = solver.get_solution_steps()
+            for step in steps:
+                st.markdown(step)
 
+            # Получаем корни для сохранения в истории
             roots = solver.solve()
-            if isinstance(roots, str):
-                st.warning(roots)
-            else:
-                if len(roots) == 1:
-                    st.success(f"x = {roots[0]:.2f}")
-                else:
-                    st.success(f"x₁ = {roots[0]:.2f}")
-                    st.success(f"x₂ = {roots[1]:.2f}")
 
             # Save solution to database
             save_solution(a, b, c, solver, roots)
 
             # Plot the quadratic function
+            st.markdown("### График функции:")
             fig = plot_quadratic(a, b, c)
             st.pyplot(fig)
         else:
