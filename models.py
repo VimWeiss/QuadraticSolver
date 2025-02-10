@@ -19,7 +19,7 @@ class EquationHistory(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
 # Create database and tables
-engine = create_engine('sqlite:///quadratic_equations.db')
+engine = create_engine('sqlite:///equation_history.db')
 Base.metadata.create_all(engine)
 
 # Create session factory

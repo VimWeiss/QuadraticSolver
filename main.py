@@ -2,30 +2,7 @@ import streamlit as st
 import numpy as np
 from solver import QuadraticSolver
 import matplotlib.pyplot as plt
-from sqlalchemy import create_engine, Column, Integer, Float, String, DateTime
-from sqlalchemy.orm import sessionmaker, declarative_base
-from sqlalchemy.ext.declarative import declarative_base
-from datetime import datetime
-
-Base = declarative_base()
-
-class EquationHistory(Base):
-    __tablename__ = 'equation_history'
-    id = Column(Integer, primary_key=True)
-    a = Column(Float)
-    b = Column(Float)
-    c = Column(Float)
-    discriminant = Column(Float)
-    solution_text = Column(String)
-    root1 = Column(Float)
-    root2 = Column(Float)
-    created_at = Column(DateTime, default=datetime.utcnow)
-
-
-engine = create_engine('sqlite:///equation_history.db')
-Base.metadata.create_all(engine)
-Session = sessionmaker(bind=engine)
-
+from models import EquationHistory, Session
 
 def format_term(coef, var='', power=''):
     if coef == 0:
