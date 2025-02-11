@@ -1,6 +1,5 @@
 [server]
 headless = true
-address = unset
 port = 8501
 
 [theme]
